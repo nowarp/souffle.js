@@ -1,0 +1,61 @@
+name: CI
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+  workflow_dispatch:
+
+jobs:
+  test:
+    strategy:
+      fail-fast: false
+      matrix:
+        node-version: [18.x]
+        os: [ubuntu-latest]
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+    - name: Checkout Misti
+      uses: actions/checkout@v2
+
+    - name: Setup Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: "yarn"
+
+    - name: Install Dependencies
+      run: yarn install
+
+    - name: Install Soufflé on Ubuntu
+      if: matrix.os == 'ubuntu-latest'
+      run: |
+        sudo wget https://souffle-lang.github.io/ppa/souffle-key.public -O /usr/share/keyrings/souffle-archive-keyring.gpg
+        echo "deb [signed-by=/usr/share/keyrings/souffle-archive-keyring.gpg] https://souffle-lang.github.io/ppa/ubuntu/ stable main" | sudo tee /etc/apt/sources.list.d/souffle.list
+        sudo apt update
+        sudo apt install souffle
+
+    - name: Check broken links
+      uses: lycheeverse/lychee-action@v1
+      with:
+        args: src/ test/ examples/ bin/ benchmarks/ scripts/ README.md RELEASE.md CONTRIBUTING.md HACKING.md
+        output: /tmp/lychee.txt
+        fail: true
+
+    - name: Spellcheck code base
+      run: |
+        yarn spell
+
+    - name: Check formatting with Prettier
+      run: yarn fmt
+
+    - name: Run ESLint
+      run: yarn lint
+
+    - name: Run tests
+      run: |
+        yarn build
+        yarn test
