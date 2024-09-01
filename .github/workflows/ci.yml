@@ -18,7 +18,7 @@ jobs:
     runs-on: ${{ matrix.os }}
 
     steps:
-    - name: Checkout Misti
+    - name: Checkout Souffle.js
       uses: actions/checkout@v2
 
     - name: Setup Node.js ${{ matrix.node-version }}
@@ -37,13 +37,6 @@ jobs:
         echo "deb [signed-by=/usr/share/keyrings/souffle-archive-keyring.gpg] https://souffle-lang.github.io/ppa/ubuntu/ stable main" | sudo tee /etc/apt/sources.list.d/souffle.list
         sudo apt update
         sudo apt install souffle
-
-    - name: Check broken links
-      uses: lycheeverse/lychee-action@v1
-      with:
-        args: src/ test/ examples/ bin/ benchmarks/ scripts/ README.md RELEASE.md CONTRIBUTING.md HACKING.md
-        output: /tmp/lychee.txt
-        fail: true
 
     - name: Spellcheck code base
       run: |
