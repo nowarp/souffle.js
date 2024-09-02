@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 ### Changed
+- Package name in npm.
 
 ### Fixed
 - Paths to library entries in `package.json`.
