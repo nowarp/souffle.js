@@ -7,7 +7,7 @@ Souffle.js offers bindings to [Soufflé](https://souffle-lang.github.io/), an op
 Install the library with Yarn:
 
 ```bash
-yarn add @nowarp/souffle.js
+yarn add @nowarp/souffle
 ```
 
 ## Getting Started
