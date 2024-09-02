@@ -1,6 +1,6 @@
 {
   "name": "@nowarp/souffle",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Souffle bindings for JavaScript/TypeScript",
   "author": "Georgiy Komarov <jubnzv@gmail.com>",
   "license": "Apache-2.0",
