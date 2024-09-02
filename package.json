@@ -1,5 +1,5 @@
 {
-  "name": "@nowarp/misti",
+  "name": "@nowarp/souffle.js",
   "version": "0.0.1",
   "description": "Souffle bindings for JavaScript/TypeScript",
   "author": "Georgiy Komarov <jubnzv@gmail.com>",
