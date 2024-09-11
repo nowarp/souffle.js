@@ -17,6 +17,8 @@ export interface SouffleExecutorParams {
   inputDir?: string;
   /** Temporary directory or path to CSV output from Soufflé. */
   outputDir?: string;
+  /** Try to process results to get the structured output. */
+  processResults?: boolean;
 }
 
 /**
@@ -44,15 +46,18 @@ export abstract class SouffleExecutor<FactData> {
   protected soufflePath: string;
   protected inputDir: string;
   protected outputDir: string;
+  protected processResults: boolean;
 
   constructor({
     soufflePath = "souffle",
     inputDir = "/tmp/souffle-js",
     outputDir = "/tmp/souffle-js",
+    processResults = true,
   }: Partial<SouffleExecutorParams> = {}) {
     this.soufflePath = soufflePath;
     this.inputDir = inputDir;
     this.outputDir = outputDir;
+    this.processResults = processResults;
   }
 
   public abstract execute(
@@ -92,6 +97,9 @@ export class SouffleSyncExecutor<FactData> extends SouffleExecutor<FactData> {
           acc.set(relationName, parseResultsSync(filepath));
           return acc;
         }, new Map<string, SouffleOutputRaw>());
+      if (!this.processResults) {
+        return { kind: "raw", results: rawResults };
+      }
       const results = SouffleOutputStructured.fromRaw(ctx, rawResults);
       return results !== undefined
         ? { kind: "structured", results }
@@ -136,6 +144,9 @@ export class SouffleAsyncExecutor<FactData> extends SouffleExecutor<FactData> {
                 acc.set(relationName, rawResults);
                 return acc;
               }, Promise.resolve(new Map<string, SouffleOutputRaw>()));
+            if (!this.processResults) {
+              resolve({ kind: "raw", results: rawResults });
+            }
             const results = SouffleOutputStructured.fromRaw(ctx, rawResults);
             resolve(
               results !== undefined
