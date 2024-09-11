@@ -9,6 +9,39 @@ export type SouffleComment = {
 };
 
 /**
+ * Type definitions.
+ * See: https://souffle-lang.github.io/types
+ */
+export type SouffleTypeDefinition =
+  | SouffleEquivalenceTypeDefinition
+  | SouffleSubtypeTypeDefinition;
+export type SouffleEquivalenceTypeDefinition = {
+  kind: "equivalence_type_definition";
+  name: string;
+  type: SouffleType;
+};
+export type SouffleSubtypeTypeDefinition = {
+  kind: "subtype_type_definition";
+  name: string;
+  type: SouffleType;
+};
+
+/**
+ * Souffle type annotations as they appear in the source code.
+ */
+export type SouffleType = SoufflePrimitiveType | SouffleCustomType;
+export type SouffleCustomType = { kind: "custom_type"; value: string };
+export type SoufflePrimitiveType = {
+  kind: "primitive_type";
+  value: SoufflePrimitiveTypeValue;
+};
+export type SoufflePrimitiveTypeValue =
+  | "Symbol"
+  | "Number"
+  | "Unsigned"
+  | "Float";
+
+/**
  * Soufflé facts are always connected to relation declarations, which define their
  * type. Thus, in most cases, you should use `SouffleContext.addFact` to introduce
  * new facts bound to relations.
@@ -21,7 +54,6 @@ export type SouffleFact<FactData = undefined> = {
   data?: FactData;
 };
 export type SouffleFactValue = string | number;
-export type SouffleFactType = "Symbol" | "Number" | "Unsigned" | "Float";
 
 /**
  * Declaration of a Soufflé relation.
@@ -31,9 +63,10 @@ export type SouffleRelation = {
   kind: "relation";
   name: string;
   comment: SouffleComment | undefined;
-  args: [string, SouffleFactType][];
+  args: SouffleRelationArg[];
   io: SouffleRelationIO | undefined;
 };
+export type SouffleRelationArg = { name: string; type: SouffleType };
 export type SouffleRelationIO = "input" | "output";
 
 /**
@@ -95,12 +128,14 @@ export type SouffleProgram<FactData = undefined> = {
 
 export type SouffleProgramEntry<FactData = undefined> =
   | SouffleComment
+  | SouffleTypeDefinition
   | SouffleFact<FactData>
   | SouffleRelation
   | SouffleRule;
 
 export type SouffleNode<FactData = undefined> =
   | SouffleComment
+  | SouffleTypeDefinition
   | SouffleProgram<FactData>
   | SouffleFact<FactData>
   | SouffleRelation

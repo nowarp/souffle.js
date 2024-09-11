@@ -7,11 +7,18 @@ export {
   SouffleProgram,
   SouffleFact,
   SouffleFactValue,
-  SouffleFactType,
   SouffleProgramEntry,
   SouffleRelation,
   SouffleRule,
   SouffleAtom,
+  SouffleRelationArg,
+  SouffleType,
+  SouffleCustomType,
+  SoufflePrimitiveType,
+  SoufflePrimitiveTypeValue,
+  SouffleTypeDefinition,
+  SouffleEquivalenceTypeDefinition,
+  SouffleSubtypeTypeDefinition,
 } from "./syntax";
 export {
   comment,
@@ -25,6 +32,8 @@ export {
   rule,
   program,
   binaryConstraint,
+  Type,
+  TypeDef,
 } from "./syntaxConstructors";
 export { SouffleContext } from "./context";
 export { SouffleEmitter } from "./emitter";

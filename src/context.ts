@@ -4,6 +4,7 @@ import {
   SouffleFactValue,
   SouffleProgramEntry,
   SouffleRule,
+  SouffleTypeDefinition,
   SouffleComment,
   SouffleProgram,
 } from "./syntax";
@@ -55,6 +56,11 @@ export class SouffleContext<FactData = undefined> {
   private rules: SouffleRule[] = [];
 
   /**
+   * Soufflé types defined in the program.
+   */
+  private types: SouffleTypeDefinition[] = [];
+
+  /**
    * @param name Unique name of the generated program.
    * @param comment Docstring-like comment to be added on the top of the generated program.
    * @param addComments Include comments to the generated program.
@@ -95,7 +101,7 @@ export class SouffleContext<FactData = undefined> {
       },
       [] as SouffleProgramEntry<FactData>[],
     );
-    const entries = [...relationsWithFacts, ...this.rules];
+    const entries = [...this.types, ...relationsWithFacts, ...this.rules];
     return program<FactData>(this.name, entries, this.programComment);
   }
 
@@ -152,13 +158,22 @@ export class SouffleContext<FactData = undefined> {
    * Adds new entities to the Soufflé program.
    * @throws If an entity is already defined.
    */
-  public add(entity: SouffleRelation | SouffleRule) {
-    if (entity.kind === "relation") {
-      this.addRelation(entity);
-    } else if (entity.kind === "rule") {
-      this.addRule(entity);
-    } else {
-      throw SouffleUsageError.make(`Cannot add unsupported entity: ${entity}`);
+  public add(entity: SouffleRelation | SouffleRule | SouffleTypeDefinition) {
+    switch (entity.kind) {
+      case "relation":
+        this.addRelation(entity);
+        break;
+      case "rule":
+        this.addRule(entity);
+        break;
+      case "equivalence_type_definition":
+      case "subtype_type_definition":
+        this.addTypeDef(entity);
+        break;
+      default:
+        throw SouffleUsageError.make(
+          `Cannot add unsupported entity: ${entity}`,
+        );
     }
   }
 
@@ -210,7 +225,7 @@ export class SouffleContext<FactData = undefined> {
    * @param rule The rule to add to the program.
    * @throws Error if any head relation is not defined.
    */
-  private addRule(rule: SouffleRule) {
+  private addRule(rule: SouffleRule): void | never {
     const undefinedRelations = rule.heads
       .filter((head) => !this.relations.has(head.name))
       .map((head) => head.name);
@@ -220,5 +235,12 @@ export class SouffleContext<FactData = undefined> {
       );
     }
     this.rules.push(rule);
+  }
+
+  /**
+   * Adds a new type definition to the Soufflé program.
+   */
+  private addTypeDef(typedef: SouffleTypeDefinition): void {
+    this.types.push(typedef);
   }
 }

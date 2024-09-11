@@ -9,6 +9,7 @@ import {
   rule,
   atom,
   body,
+  Type,
 } from "../src";
 
 // Initialize the Souffle context that keeps the created program entries.
@@ -21,28 +22,28 @@ const ctx = new SouffleContext("VarPointsTo");
 // .decl st( a:symbol, f:symbol, b:symbol )
 ctx.add(
   relation("assign", [
-    ["a", "Symbol"],
-    ["b", "Symbol"],
+    ["a", Type.symbol()],
+    ["b", Type.symbol()],
   ]),
 );
 ctx.add(
   relation("new", [
-    ["v", "Symbol"],
-    ["o", "Symbol"],
+    ["v", Type.symbol()],
+    ["o", Type.symbol()],
   ]),
 );
 ctx.add(
   relation("ld", [
-    ["a", "Symbol"],
-    ["b", "Symbol"],
-    ["f", "Symbol"],
+    ["a", Type.symbol()],
+    ["b", Type.symbol()],
+    ["f", Type.symbol()],
   ]),
 );
 ctx.add(
   relation("st", [
-    ["a", "Symbol"],
-    ["f", "Symbol"],
-    ["b", "Symbol"],
+    ["a", Type.symbol()],
+    ["f", Type.symbol()],
+    ["b", Type.symbol()],
   ]),
 );
 
@@ -71,8 +72,8 @@ ctx.add(
   relation(
     "alias",
     [
-      ["a", "Symbol"],
-      ["b", "Symbol"],
+      ["a", Type.symbol()],
+      ["b", Type.symbol()],
     ],
     "output",
   ),
@@ -99,8 +100,8 @@ ctx.add(
   relation(
     "pointsTo",
     [
-      ["a", "Symbol"],
-      ["o", "Symbol"],
+      ["a", Type.symbol()],
+      ["o", Type.symbol()],
     ],
     "output",
   ),

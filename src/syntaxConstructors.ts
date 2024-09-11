@@ -10,9 +10,14 @@ import {
   SouffleConstraint,
   SouffleConstraintOp,
   SouffleRelation,
-  SouffleFactType,
   SouffleRule,
+  SouffleType,
+  SouffleCustomType,
+  SouffleRelationArg,
+  SoufflePrimitiveType,
   SouffleAtom,
+  SouffleEquivalenceTypeDefinition,
+  SouffleSubtypeTypeDefinition,
 } from "./syntax";
 
 export type CommentValue = string | string[];
@@ -53,7 +58,7 @@ export function fact<D = undefined>(
 
 export function relation(
   name: string,
-  args: [string, SouffleFactType][],
+  args: [string, SouffleType][],
   io?: SouffleRelationIO,
   comment?: SouffleComment | CommentValue,
 ): SouffleRelation {
@@ -61,7 +66,7 @@ export function relation(
     kind: "relation",
     name,
     comment: wrapComment(comment),
-    args,
+    args: args.map(([name, type]) => ({ name, type }) as SouffleRelationArg),
     io,
   };
 }
@@ -150,4 +155,43 @@ export function program<D = undefined>(
     comment: wrapComment(comment),
     entries,
   };
+}
+
+export class TypeDef {
+  private constructor() {}
+
+  public static equivalence(
+    name: string,
+    type: SouffleType,
+  ): SouffleEquivalenceTypeDefinition {
+    return { kind: "equivalence_type_definition", name, type };
+  }
+
+  public static subtype(
+    name: string,
+    type: SouffleType,
+  ): SouffleSubtypeTypeDefinition {
+    return { kind: "subtype_type_definition", name, type };
+  }
+}
+
+export class Type {
+  private constructor() {}
+
+  public static symbol(): SoufflePrimitiveType {
+    return { kind: "primitive_type", value: "Symbol" };
+  }
+  public static number(): SoufflePrimitiveType {
+    return { kind: "primitive_type", value: "Number" };
+  }
+  public static unsigned(): SoufflePrimitiveType {
+    return { kind: "primitive_type", value: "Unsigned" };
+  }
+  public static float(): SoufflePrimitiveType {
+    return { kind: "primitive_type", value: "Float" };
+  }
+
+  public static custom(value: string): SouffleCustomType {
+    return { kind: "custom_type", value };
+  }
 }

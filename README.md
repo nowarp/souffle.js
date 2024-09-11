@@ -20,8 +20,8 @@ const ctx = new SouffleContext("VarPointsTo");
 // Declare relations
 ctx.add(
   relation("assign", [
-    ["a", "Symbol"],
-    ["b", "Symbol"],
+    ["a", Type.symbol()],
+    ["b", Type.symbol()],
   ]),
 );
 
@@ -33,8 +33,8 @@ ctx.add(
   relation(
     "alias",
     [
-      ["a", "Symbol"],
-      ["b", "Symbol"],
+      ["a", Type.symbol()],
+      ["b", Type.symbol()],
     ],
     "output",
   ),

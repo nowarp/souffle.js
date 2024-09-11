@@ -5,6 +5,8 @@ import {
   rule,
   atom,
   body,
+  Type,
+  TypeDef,
 } from "../src";
 
 describe("Souffle.js integration tests", () => {
@@ -14,28 +16,28 @@ describe("Souffle.js integration tests", () => {
     // Add relation declarations
     ctx.add(
       relation("assign", [
-        ["a", "Symbol"],
-        ["b", "Symbol"],
+        ["a", Type.symbol()],
+        ["b", Type.symbol()],
       ]),
     );
     ctx.add(
       relation("new", [
-        ["v", "Symbol"],
-        ["o", "Symbol"],
+        ["v", Type.symbol()],
+        ["o", Type.symbol()],
       ]),
     );
     ctx.add(
       relation("ld", [
-        ["a", "Symbol"],
-        ["b", "Symbol"],
-        ["f", "Symbol"],
+        ["a", Type.symbol()],
+        ["b", Type.symbol()],
+        ["f", Type.symbol()],
       ]),
     );
     ctx.add(
       relation("st", [
-        ["a", "Symbol"],
-        ["f", "Symbol"],
-        ["b", "Symbol"],
+        ["a", Type.symbol()],
+        ["f", Type.symbol()],
+        ["b", Type.symbol()],
       ]),
     );
 
@@ -52,8 +54,8 @@ describe("Souffle.js integration tests", () => {
       relation(
         "alias",
         [
-          ["a", "Symbol"],
-          ["b", "Symbol"],
+          ["a", Type.symbol()],
+          ["b", Type.symbol()],
         ],
         "output",
       ),
@@ -99,11 +101,11 @@ describe("Souffle.js integration tests", () => {
     // Add relation declarations
     ctx.add(
       relation("edge", [
-        ["from", "Symbol"],
-        ["to", "Symbol"],
+        ["from", Type.symbol()],
+        ["to", Type.symbol()],
       ]),
     );
-    ctx.add(relation("reachable", [["node", "Symbol"]], "output"));
+    ctx.add(relation("reachable", [["node", Type.symbol()]], "output"));
 
     // Add facts
     ctx.addFact("edge", ["A", "B"]);
@@ -135,16 +137,16 @@ describe("Souffle.js integration tests", () => {
     // Add relation declarations
     ctx.add(
       relation("parent", [
-        ["child", "Symbol"],
-        ["parent", "Symbol"],
+        ["child", Type.symbol()],
+        ["parent", Type.symbol()],
       ]),
     );
     ctx.add(
       relation(
         "ancestor",
         [
-          ["descendant", "Symbol"],
-          ["ancestor", "Symbol"],
+          ["descendant", Type.symbol()],
+          ["ancestor", Type.symbol()],
         ],
         "output",
       ),
@@ -167,7 +169,7 @@ describe("Souffle.js integration tests", () => {
       ),
     );
 
-    const executor = new SouffleSyncExecutor();
+    const executor = new SouffleSyncExecutor({ processResults: false });
     const out = executor.execute(ctx);
     expect(out.kind).toBe("raw");
     if (out.kind !== "raw") {
@@ -182,5 +184,82 @@ describe("Souffle.js integration tests", () => {
       ["E", "A"],
       ["E", "C"],
     ]);
+  });
+
+  it("should generate and execute a program with equivalence types", () => {
+    const ctx = new SouffleContext("EquivalenceTypes");
+
+    ctx.add(TypeDef.equivalence("Alias", Type.symbol()));
+
+    ctx.add(
+      relation("assign", [
+        ["a", Type.custom("Alias")],
+        ["b", Type.custom("Alias")],
+      ]),
+    );
+    ctx.add(
+      relation(
+        "alias",
+        [
+          ["a", Type.custom("Alias")],
+          ["b", Type.custom("Alias")],
+        ],
+        "output",
+      ),
+    );
+
+    ctx.addFact("assign", ["v1", "v2"]);
+
+    ctx.add(
+      rule([atom("alias", ["X", "Y"])], [body(atom("assign", ["X", "Y"]))]),
+    );
+
+    const executor = new SouffleSyncExecutor({ processResults: false });
+    const out = executor.execute(ctx);
+    expect(out.kind).toBe("raw");
+    if (out.kind !== "raw") {
+      throw new Error("impossible");
+    }
+    expect(out.results).toBeDefined();
+    expect(out.results.get("alias")!).toEqual([["v1", "v2"]]);
+  });
+
+  it("should generate and execute a program with subtype types", () => {
+    const ctx = new SouffleContext("SubtypeTypes");
+
+    ctx.add(TypeDef.subtype("Alias", Type.symbol()));
+
+    ctx.add(
+      relation("assign", [
+        ["a", Type.custom("Alias")],
+        ["b", Type.symbol()],
+      ]),
+    );
+    ctx.add(
+      relation(
+        "alias",
+        [
+          ["a", Type.custom("Alias")],
+          ["b", Type.symbol()],
+        ],
+        "output",
+      ),
+    );
+
+    ctx.addFact("assign", ["v1", "v2"]);
+
+    ctx.add(
+      rule([atom("alias", ["X", "Y"])], [body(atom("assign", ["X", "Y"]))]),
+    );
+
+    const executor = new SouffleSyncExecutor({ processResults: false });
+    const out = executor.execute(ctx);
+
+    expect(out.kind).toBe("raw");
+    if (out.kind !== "raw") {
+      throw new Error("impossible");
+    }
+    expect(out.results).toBeDefined();
+    expect(out.results.get("alias")!).toEqual([["v1", "v2"]]);
   });
 });

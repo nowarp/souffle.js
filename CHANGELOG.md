@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - `processResults` option to `ExecutionContext` in order to enforce producing raw or structured output.
+- Equivalence and subtype types: Issue [#2](https://github.com/nowarp/souffle.js/issues/2)
 
 ### Changed
 

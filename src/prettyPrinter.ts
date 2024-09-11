@@ -8,6 +8,8 @@ import {
   SouffleRelation,
   SouffleRule,
   SouffleAtom,
+  SouffleType,
+  SouffleTypeDefinition,
 } from "./syntax";
 import { SouffleInternalError } from "./errors";
 
@@ -36,6 +38,9 @@ export class SoufflePrettyPrinter<FactData = undefined> {
         return this.ppRule(node);
       case "atom":
         return this.ppAtom(node);
+      case "equivalence_type_definition":
+      case "subtype_type_definition":
+        return this.ppTypeDefinition(node);
       default:
         throw SouffleInternalError.make(
           `Unsupported node: ${JSON.stringify(node)}`,
@@ -93,13 +98,39 @@ export class SoufflePrettyPrinter<FactData = undefined> {
     return `${fact.relationName}(${values}).`;
   }
 
+  private ppType(ty: SouffleType): string {
+    switch (ty.kind) {
+      case "primitive_type":
+        return ty.value.toLowerCase();
+      case "custom_type":
+        return ty.value;
+      default:
+        throw SouffleInternalError.make(
+          `Unsupported type: ${JSON.stringify(ty)}`,
+        );
+    }
+  }
+
+  private ppTypeDefinition(ty: SouffleTypeDefinition): string | never {
+    switch (ty.kind) {
+      case "equivalence_type_definition":
+        return `.type ${ty.name} = ${this.ppType(ty.type)}`;
+      case "subtype_type_definition":
+        return `.type ${ty.name} <: ${this.ppType(ty.type)}`;
+      default:
+        throw SouffleInternalError.make(
+          `Unsupported type definition: ${JSON.stringify(ty)}`,
+        );
+    }
+  }
+
   private ppRelation(relation: SouffleRelation): string {
     const comment =
       this.addComments && relation.comment
         ? this.ppComment(relation.comment) + "\n"
         : "";
     const args = relation.args
-      .map(([name, type]) => `${name}: ${type.toLowerCase()}`)
+      .map(({ name, type }) => `${name}: ${this.ppType(type)}`)
       .join(", ");
     const io =
       relation.io === undefined
