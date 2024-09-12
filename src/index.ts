@@ -44,3 +44,4 @@ export {
   SouffleExecutionError,
 } from "./errors";
 export { SoufflePrettyPrinter } from "./prettyPrinter";
+export { SOUFFLE_VERSION } from "./version";
