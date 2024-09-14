@@ -61,9 +61,11 @@ export class SouffleContext<FactData = undefined> {
   private types: SouffleTypeDefinition[] = [];
 
   /**
-   * @param name Unique name of the generated program.
-   * @param comment Docstring-like comment to be added on the top of the generated program.
-   * @param addComments Include comments to the generated program.
+   * @param name The unique name of the generated program.
+   * @param options An optional object with settings for the generated program.
+   *   - `comment`: A docstring-like comment to be added at the top of the generated program.
+   *   - `addComments`: Whether to include comments in the generated program. Defaults to `false`.
+   *   - `logger`: A custom logger instance.
    */
   constructor(
     private name: string,
@@ -193,7 +195,7 @@ export class SouffleContext<FactData = undefined> {
   /**
    * Adds a new fact to an existing relation.
    * @param name The name of the relation to which the fact is related.
-   * @param fact Fact values to add.
+   * @param factValues Fact values to add.
    * @throws Error if the relation does not exist.
    */
   public addFact(
