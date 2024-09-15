@@ -1,9 +1,9 @@
 {
   "entryPoints": [
-    "src/main.ts"
+    "src/index.ts"
   ],
   "out": "docs/api",
-  "name": "Misti",
+  "name": "Souffle.js",
   "theme": "default",
   "excludePrivate": true
 }
